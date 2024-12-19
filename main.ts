@@ -1,39 +1,16 @@
 let reading: number;
-//  Using Python 3.0
-//  プレイヤーの種類を示す値を保存
-let Player_type = 1
-//  加速計用関数
-let Kasoku_ofset = 0
-//  プレイヤーの状態保存用
 let game_of_set = 0
-//  ゲームの開始状態を保存
+let Getplay = 0
+let Kasoku_ofset = 0
+let receivedNumber = 1
+let Player_type = 1
+let NanoProduct = 1
+// 製品(2セットで1)別に割り当てる番号
+radio.setGroup(NanoProduct)
 function title_screen() {
-    music.play(music.stringPlayable("G E F F C C A A ", 120), music.PlaybackMode.UntilDone)
-    // 待機モーション
+    //  wtf?! why is this error hapeninng?!
+    //  待機モーション
     if (game_of_set == 0) {
-        basic.showLeds(`
-                    . # . # .
-                    . # . # .
-                    . . . . .
-                    # . . . #
-                    . # # # .
-                    `)
-        basic.pause(300)
-        basic.showLeds(`
-                    . . . . #
-                    # # . # .
-                    . . . . #
-                    # . . . .
-                    . # # # .
-                    `)
-    }
-    
-}
-
-while (true) {
-    title_screen()
-    // Start Title
-    if (Player_type == 1 && game_of_set == 1) {
         basic.showLeds(`
                             . # . # .
                             . # . # .
@@ -41,23 +18,98 @@ while (true) {
                             # . . . #
                             . # # # .
                             `)
-    } else if (Player_type == 2 && game_of_set == 1) {
+        basic.pause(300)
         basic.showLeds(`
-            # # # # #
-            . # # . #
-            # # # # #
-            # . # . .
-            # # # . .
-            `)
-        reading = input.acceleration(Dimension.X)
-        if (reading > 20 && game_of_set == 1) {
-            RingbitCar.freestyle(-10, 10)
-        } else if (reading < -20 && game_of_set == 1) {
-            RingbitCar.freestyle(10, -10)
-        } else {
-            console.log("Hello")
-        }
-        
+                            . . . . #
+                            # # . # .
+                            . . . . #
+                            # . . . .
+                            . # # # .
+                            `)
+        basic.pause(200)
+        basic.clearScreen()
+        katakana.setScrollTime(30)
+        katakana.showString("LONG PLESS AB TO PLAY")
+    }
+    
+}
+
+radio.onReceivedNumber(function on_received_number() {
+    // シリアル処理
+    music.play(music.stringPlayable("G A B C5 C5 - - - ", 300), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+                    # # # # #
+                    . # # . #
+                    # # # # #
+                    # . # . .
+                    # # # . .
+                    `)
+    basic.pause(1500)
+    let Player_type = 2
+})
+while (true) {
+    // プレイ開始を監視
+    if (input.buttonIsPressed(Button.B) && game_of_set == 0) {
+        basic.clearScreen()
+        game_of_set = 1
+        radio.sendNumber(1)
+        Player_type = 1
+        music.play(music.stringPlayable("G A B C5 C5 - - - ", 300), music.PlaybackMode.UntilDone)
+        basic.showLeds(`
+                            # . # # #
+                            # . # . #
+                            # . # # #
+                            # . # . .
+                            # . # . .
+                            `)
+        basic.pause(1500)
+    } else if (game_of_set != 1) {
+        title_screen()
+    }
+    
+    // 加速度センサーとプレイ中モーション
+    reading = input.acceleration(Dimension.X)
+    if (reading > 100 && game_of_set == 1) {
+        //  turn right
+        RingbitCar.freestyle(-10, 10)
+        basic.showLeds(`
+                . # . . #
+                # . . # .
+                . . . . .
+                # # . . .
+                . . # # #
+                `)
+    } else if (reading < -100 && game_of_set == 1) {
+        //  turn left
+        RingbitCar.freestyle(10, -10)
+        basic.showLeds(`
+                # . . # .
+                . # . . #
+                . . . . .
+                . . # # #
+                # # . . .
+                `)
+    } else if (game_of_set == 1) {
+        reading = 0
+        basic.showLeds(`
+                . # . # .
+                . # . # .
+                . . . . .
+                # . . . #
+                . # # # .
+                `)
+        basic.pause(randint(500, 700))
+        basic.showLeds(`
+                . . . . .
+                # # . # #
+                . . . . .
+                # . . . #
+                . # # # .
+                `)
+    }
+    
+    if (input.logoIsPressed()) {
+        music.play(music.stringPlayable("C5 C5 A A - D D D ", 700), music.PlaybackMode.UntilDone)
     }
     
 }
