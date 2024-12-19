@@ -1,38 +1,44 @@
 # Using Python 3.0
 
-def Kasoku():
-    global reading
-    reading = input.acceleration(Dimension.X)
-    if reading > 20:
-        # a=right
-        Kasoku_ofset = 1
-        music.play(music.string_playable("- - - E - F - - ", 120),
-            music.PlaybackMode.UNTIL_DONE)
-    elif reading < -20:
-        # a=left
-        Kasoku_ofset = 2
-        music.play(music.string_playable("- - - E - F - - ", 120),
-            music.PlaybackMode.UNTIL_DONE)
-    else:
-        # a=y=x
-        Kasoku_ofset = 0
-while True:
+# プレイヤーの種類を示す値を保存
+Player_type = 1 # 加速計用関数
+Kasoku_ofset = 0 # プレイヤーの状態保存用
+game_of_set = 0 # ゲームの開始状態を保存
 
-    reading = 0         #プレイヤーの種類を示す値を保存
-    Player_type = 1     # 加速計用関数
-    Kasoku_ofset = 0    # プレイヤーの状態保存用
-    game_of_set = 0     #ゲームの開始状態を保存
+
+def title_screen():
+    music.play(music.string_playable("G E F F C C A A ", 120),music.PlaybackMode.UNTIL_DONE)
     
-    Kasoku()            # 加速計の傾き状態を保存
+    #待機モーション
+    if game_of_set == 0:
+        basic.show_leds("""
+                    . # . # .
+                    . # . # .
+                    . . . . .
+                    # . . . #
+                    . # # # .
+                    """)
+        basic.pause(300)
+        basic.show_leds("""
+                    . . . . #
+                    # # . # .
+                    . . . . #
+                    # . . . .
+                    . # # # .
+                    """)
 
+while True:
+    title_screen()
+
+    #Start Title
     if Player_type == 1 and game_of_set == 1:
         basic.show_leds("""
-            # . # # #
-            # . # . #
-            # . # # #
-            # . # . .
-            # . # . .
-            """)
+                            . # . # .
+                            . # . # .
+                            . . . . .
+                            # . . . #
+                            . # # # .
+                            """)
     elif Player_type == 2 and game_of_set == 1:
         basic.show_leds("""
             # # # # #
@@ -41,28 +47,17 @@ while True:
             # . # . .
             # # # . .
             """)
-    else:
-        basic.show_leds("""
-                    . # . # .
-                    . # . # .
-                    . . . . .
-                    # . . . #
-                    . #  # # .
-                    """)
-        basic.pause(300)
-        basic.show_leds("""
-                        . . . . #
-                        # # . # .
-                        . . . . #
-                        # . . . .
-                        . #  # # .
-                        """)
-        
 
 
+        reading = input.acceleration(Dimension.X)
 
+        if reading > 20 and game_of_set == 1:
+            RingbitCar.freestyle(-10, 10)
 
-    if Kasoku_ofset == 1:
-        RingbitCar.freestyle(-10, 10)
-    elif Kasoku_ofset == 2:
-        RingbitCar.freestyle(10,-10)
+        elif reading < -20 and game_of_set == 1:
+            RingbitCar.freestyle(10, -10)
+
+        else:
+            print("Hello")
+            
+
